@@ -45,7 +45,6 @@ class Calculator:
 		return (-b / (2 * a))
 
 	def calcul_polynome1(self, a, b):
-		print ("Process data  : " + str(b) + "*X + " + str(a))
 		return (-a / b);
 
 # a : x2
@@ -65,25 +64,30 @@ class Polynome_deg_2:
 		self.polynomial_degree = 0
 
 	def found_polynomial_degree(self):
-		self.polynomial_degree = (self.main_member.items()[len(self.main_member.items()) - 1][0])
+		for key, value in self.main_member.items():
+			if (value != 0.0):
+				self.polynomial_degree = key
 
-	def found_type_sqrt(self, data):
-		type_sqrt = (data.split('^'))
-		number = int(type_sqrt[1])
-		return (number)
+	def found_type_power(self, data):
+		if (len(data) == 2):
+			data = data[1]
+			type_power = (data.split('^'))
+			return (int(type_power[1]))
+		else:
+			return (0)
 
 	def parsing_member(self, data):
 		member = {}
-		dat = data.split('+')
 		data = extend_split_preserve_sep(data, '+-')
 		for i in data:
-			tmp = i.split('*')
-			for ii in tmp:
-				tmp2 = i.split('*')
-				tt = float(tmp2[0].replace(' ', '').replace('+',''))
-				member[self.found_type_sqrt(tmp2[1])] = float(tt)#float(tmp2[0])
+			tmp2 = i.split('*')
+			tt = float(tmp2[0].replace(' ', '').replace('+',''))
+			member[self.found_type_power(tmp2)] = float(tt)
 		return (member)
 
+	# reduced form
+	# 5 * X^0 + 4 * X^1 + 9.3 * X^2 = 1 * X^0 + 10 * X^5 -->
+	# 4.0 * X^0 + 4.0 * X^1 + 9.3 * X^2 - 10.0 * X^5 = 0
 	def add_two_member(self):
 		for _ in self.right_member:
 			self.main_member[_] = self.right_member[_]	
@@ -111,7 +115,7 @@ class Polynome_deg_2:
 			self.x2 = Calculator().calc_x2(self.discr, self.main_member[2], self.main_member[1], self.main_member[0])
 
 		elif (self.discr == 0):
-			x = calc_x(self, a, b)
+			self.x = calc_x(self, a, b)
 
 	def calcul_polynome_gen(self):
 		if (self.polynomial_degree == 2):
@@ -130,13 +134,9 @@ class Polynome_deg_2:
 	#http://algor.chez.com/math/eq2deg.htm
 
 	def processing_calcul(self):
-		print ("Parsing :")
 		self.parsing()
-		print ("Found polynomial degree:")
 		self.found_polynomial_degree()
-		print ("Calcul Poly : " + str(self.polynomial_degree))
 		self.calcul_polynome_gen()
-		print ("End processing_calcul")
 
 	def display_member(self, data):
 		string = ''
@@ -170,8 +170,7 @@ class Polynome_deg_2:
 
 	def __str__(self):
 		self.found_polynomial_degree()
-		data = ''
-		data += 'Form inital: ' + str(self.init_data)
+		data = 'Form inital: ' + str(self.init_data)
 		data += '\nReduced form: ' + self.display_member(self.main_member)
 		data += '\nPolynomial degree: ' + str(self.polynomial_degree) + '\n'
 		data += self.display_solution()
@@ -190,8 +189,23 @@ def extend_split_preserve_sep(data, sep):
                         l.append(tmp)
                         tmp = ''
                 tmp += data[_]
-        tmp = ''
         return (l)
+
+class Test_framework:
+	l = list()
+
+	def test_function(self, data):
+        	c = Polynome_deg_2(data)
+        	c.processing_calcul()
+        	print (c)
+        	print ("\n---------\n\n")
+
+	def append(self, data):
+		self.l.append(data)
+
+	def test(self):
+		for i in self.l:
+			self.test_function(i)
 
 test1 =                       "5 * X^0 + 4 * X^1 + 9.3 * X^2 = 1 * X^0"
 test2 =                       "5 * X^0 + 4 * X^1 - 9.3 * X^2 = 1 * X^0"
@@ -202,7 +216,17 @@ test_invalid_polynome2 =      "5 * X^0 + 4 * X^1 + 9.3 * X^2 = 1 * X^0 + 10 * X^
 test_polynome_1 =             "5 * x^0 + 2 * X^1 = 0"
 test_polynome_1_indetermine = "0 * x^0 + 0 * X^1 = 0"
 test_polynome_1_impossible =  "10 * x^0 + 0 * X^1 = 0"
+test_fake_polynome_2 =        "5 * X^0 + 4 * X^1 + 0 * X^2 = 0"
+test_puiss_0_without_power_notation = "5 + 5 * X^1 + 2 * X^2 = 0" 
+test_0 = "0 = 0"
+test_empty_str = ""
 
+test = Test_framework()
+test.append(test1)
+test.append(test2)
+test.test()
+
+'''
 c = Polynome_deg_2(test1)
 c.processing_calcul()
 print (c)
@@ -254,12 +278,17 @@ print ("--------\n\n")
 p = Polynome_deg_2(test_polynome_1_impossible)
 p.processing_calcul()
 print (p)
-#print (c)
-#print (c.discr)
-#print (c.x)
-#print (c.x1)
-#print (c.x2)
 
+print ("--------\n\n")
 
-#print (extend_split_preserve_sep("coucou toi - salope + is her mother fucking bitches", "+-"))
-#print (extend_split_preserve_sep("5 * X^0 + 4 * X^1 - 9.3 * X^2", "+-"))
+p = Polynome_deg_2(test_fake_polynome_2)
+p.processing_calcul()
+print (p)
+
+print ("-------\n\n")
+
+z = Polynome_deg_2(test_puiss_0_without_power_notation)
+z.processing_calcul()
+print(z)
+'''
+
