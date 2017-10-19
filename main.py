@@ -83,15 +83,6 @@ class Calculator:
 # c : 1 
 
 class Polynome_deg_2:
-	#discr = 0.0
-	#x = 0.0
-	#x1 = 0.0
-	#x2 = 0.0
-	#init_data = ''
-	#right_member = {}
-	#left_member = {}
-	#main_member = {}
-
 	def __init__(self, data):
         	self.discr = 0.0
         	self.x = 0.0
@@ -101,21 +92,26 @@ class Polynome_deg_2:
         	self.left_member = {}
         	self.main_member = {}
 		self.init_data = data
+		self.polynomial_degree = 0
+
+	def found_polynomial_degree(self):
+		self.polynomial_degree = (self.main_member.items()[len(self.main_member.items()) - 1][0])
 
 	def found_type_sqrt(self, data):
 		type_sqrt = (data.split('^'))
-		print (type_sqrt[1])
 		number = int(type_sqrt[1])
 		return (number)
 
 	def parsing_member(self, data):
 		member = {}
-		data = data.split('+')
+		dat = data.split('+')
+		data = extend_split_preserve_sep(data, '+-')
 		for i in data:
 			tmp = i.split('*')
 			for ii in tmp:
 				tmp2 = i.split('*')
-				member[self.found_type_sqrt(tmp2[1])] = float(tmp2[0])
+				tt = float(tmp2[0].replace(' ', '').replace('+',''))
+				member[self.found_type_sqrt(tmp2[1])] = float(tt)#float(tmp2[0])
 		return (member)
 
 	def add_two_member(self):
@@ -135,8 +131,6 @@ class Polynome_deg_2:
 		self.right_member = self.parsing_member(all_member[0])
 		self.left_member = self.parsing_member(all_member[1])
 		self.add_two_member()
-		print (self.right_member)
-		print (self.left_member)
 
 	def calcul_poly(self):
 		self.discr = Calculator().calc_discr(self.main_member[0], self.main_member[1], self.main_member[2])
@@ -151,12 +145,56 @@ class Polynome_deg_2:
 		self.parsing()
 		self.calcul_poly()
 
+	def display_member(self, data):
+		string = ''
+		c = 0
+		for key, value in data.items():
+			string += str(abs(value)) + " * X^" + str(key)
+			if (c < len(data) - 1):
+				if (data.items()[c + 1][1] >= 0.0):
+					string += (" + ")
+				else:
+					string += (" - ")
+			c += 1
+
+		string += (' = 0')
+		print (data.items()[1][1])
+		return (string)
+
+	def display_solution(self):
+		data = ''
+		if (self.polynomial_degree == 2):
+			if (self.discr > 0):
+				data += str(self.x1) + '\n' + str(self.x2)
+			elif(self.discr == 0):
+				data += str(self.x)
+			else:
+				data += ("No solution : discr --> " + str(self.discr))
+		return (data)
 	def __str__(self):
+		self.found_polynomial_degree()
 		data = ''
 		data += 'Form inital: ' + str(self.init_data)
-		data += '\nReduced form: ' + str(self.main_member) 
+		data += '\nReduced form: ' + self.display_member(self.main_member)
+		data += '\nPolynomial degree: ' + str(self.polynomial_degree) + '\n'
+		data += self.display_solution()
 		return (data)
 
+# ret deparated data with different char and keep char in format
+def extend_split_preserve_sep(data, sep):
+        tmp = ''
+        l = list()
+        for _ in range(0, len(data)):
+                # len is for begining of str
+                # check if actual char is present is list of sep data
+                if (len(tmp) > 1 and (data[_] in sep or _ + 1 == len(data))):
+			if (_ + 1 == len(data)):
+				tmp += data[_]
+                        l.append(tmp)
+                        tmp = ''
+                tmp += data[_]
+        tmp = ''
+        return (l)
 
 test1 = "5 * X^0 + 4 * X^1 + 9.3 * X^2 = 1 * X^0"
 test2 = "5 * X^0 + 4 * X^1 - 9.3 * X^2 = 1 * X^0"
@@ -166,7 +204,13 @@ c = Polynome_deg_2(test3)
 c.processing_calcul()
 
 print (c)
-print (c.discr)
-print (c.x)
-print (c.x1)
-print (c.x2)
+
+#print (c)
+#print (c.discr)
+#print (c.x)
+#print (c.x1)
+#print (c.x2)
+
+
+#print (extend_split_preserve_sep("coucou toi - salope + is her mother fucking bitches", "+-"))
+#print (extend_split_preserve_sep("5 * X^0 + 4 * X^1 - 9.3 * X^2", "+-"))
