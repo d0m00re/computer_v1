@@ -32,18 +32,6 @@
 import math
 
 class Calculator:
-	def add(self, a, b):
-		return (a + b)
-
-	def sub(self, a, b):
-		return (a - b)
-
-	def mult(self, a, b):
-		return (a * b)
-
-	def div(self, a, b):
-		return (a / b)
-
 	def calc_discr(self, a, b, c):
 		return (b * b - 4 * a * c)
 
@@ -56,27 +44,9 @@ class Calculator:
 	def calc_x(self, a, b):
 		return (-b / (2 * a))
 
-	def basic_calcul(self, string):
-		data = string.split(" ")
-		nb1, nb2 = float(data[0]), float(data[2])
-		if (data[1] == '+'):
-			return (self.add(nb1, nb2))
-		elif (data[1] == '-'):
-			return (sub(nb1, nb2))
-		elif (data[1] == '/'):
-			return (div(nb1, nb2))
-		elif (data[1] == '*'):
-			return (mult(nb1, nb2))
-
-	def basic_calcul2(self, string):
-		return eval(string)
-
-#>>> mon_dictionnaire = {}
-#>>> mon_dictionnaire["pseudo"] = "Prolixe"
-#>>> mon_dictionnaire["mot de passe"] = "*"
-#>>> mon_dictionnaire
-#{'mot de passe': '*', 'pseudo': 'Prolixe'}
-#>>>
+	def calcul_polynome1(self, a, b):
+		print ("Process data  : " + str(b) + "*X + " + str(a))
+		return (-a / b);
 
 # a : x2
 # b : x
@@ -116,12 +86,12 @@ class Polynome_deg_2:
 
 	def add_two_member(self):
 		for _ in self.right_member:
-			self.main_member[_] = self.right_member[_]
-		for _ in self.left_member:
-			if self.main_member[_]:
-				self.main_member[_] -= self.left_member[_]
+			self.main_member[_] = self.right_member[_]	
+		for key, value in self.left_member.items():
+			if key in self.main_member:
+				self.main_member[key] -= self.left_member[key]
 			else:
-				self.main_member[_] = -(self.left_member[_])
+				self.main_member[key] = -(self.left_member[key])
 
 	def parsing(self):
 		all_member = self.init_data.split('=')
@@ -132,7 +102,9 @@ class Polynome_deg_2:
 		self.left_member = self.parsing_member(all_member[1])
 		self.add_two_member()
 
-	def calcul_poly(self):
+	# found result of 2 degree polynome
+	# stock in x, x1, x2
+	def calcul_polynome(self):
 		self.discr = Calculator().calc_discr(self.main_member[0], self.main_member[1], self.main_member[2])
 		if (self.discr > 0):
 			self.x1 = Calculator().calc_x1(self.discr, self.main_member[2], self.main_member[1], self.main_member[0])
@@ -141,13 +113,36 @@ class Polynome_deg_2:
 		elif (self.discr == 0):
 			x = calc_x(self, a, b)
 
+	def calcul_polynome_gen(self):
+		if (self.polynomial_degree == 2):
+			self.calcul_polynome()
+		elif (self.polynomial_degree == 1):
+			if (self.main_member[1] == 0.0):
+				if (self.main_member[0] == 0.0):
+					print ("Equation indeterminee")
+				else:
+					print ("Equation impossible")
+			else:
+				Calculator().calcul_polynome1(self.main_member[0], self.main_member[1])
+		else:
+			print ("Equation impossible")
+
+	#http://algor.chez.com/math/eq2deg.htm
+
 	def processing_calcul(self):
+		print ("Parsing :")
 		self.parsing()
-		self.calcul_poly()
+		print ("Found polynomial degree:")
+		self.found_polynomial_degree()
+		print ("Calcul Poly : " + str(self.polynomial_degree))
+		self.calcul_polynome_gen()
+		print ("End processing_calcul")
 
 	def display_member(self, data):
 		string = ''
 		c = 0
+		if (data.items()[0][1] < 0.0):
+			string += '-'
 		for key, value in data.items():
 			string += str(abs(value)) + " * X^" + str(key)
 			if (c < len(data) - 1):
@@ -158,7 +153,6 @@ class Polynome_deg_2:
 			c += 1
 
 		string += (' = 0')
-		print (data.items()[1][1])
 		return (string)
 
 	def display_solution(self):
@@ -170,7 +164,10 @@ class Polynome_deg_2:
 				data += str(self.x)
 			else:
 				data += ("No solution : discr --> " + str(self.discr))
+		elif (self.polynomial_degree > 2):
+				data += "The polynomial degree is stricly greater than 2, I can't solve."			
 		return (data)
+
 	def __str__(self):
 		self.found_polynomial_degree()
 		data = ''
@@ -196,15 +193,67 @@ def extend_split_preserve_sep(data, sep):
         tmp = ''
         return (l)
 
-test1 = "5 * X^0 + 4 * X^1 + 9.3 * X^2 = 1 * X^0"
-test2 = "5 * X^0 + 4 * X^1 - 9.3 * X^2 = 1 * X^0"
-test3 = "5 * X^0 + 4 * X^1 + 9.3 * X^2 = 1 * X^0 + 18.6 * X^2"
+test1 =                       "5 * X^0 + 4 * X^1 + 9.3 * X^2 = 1 * X^0"
+test2 =                       "5 * X^0 + 4 * X^1 - 9.3 * X^2 = 1 * X^0"
+test3 =                       "5 * X^0 + 4 * X^1 + 9.3 * X^2 = 1 * X^0 + 18.6 * X^2"
+test4 =                       "-10 * X^0 + 3 * X^1 + 1 * X^2 = 0" # 2 and -5
+test_invalid_polynome =       "5 * X^0 + 4 * X^1 + 9.3 * X^2 + 5.2 * X^5 = 1 * X^0"
+test_invalid_polynome2 =      "5 * X^0 + 4 * X^1 + 9.3 * X^2 = 1 * X^0 + 10 * X^5"
+test_polynome_1 =             "5 * x^0 + 2 * X^1 = 0"
+test_polynome_1_indetermine = "0 * x^0 + 0 * X^1 = 0"
+test_polynome_1_impossible =  "10 * x^0 + 0 * X^1 = 0"
 
-c = Polynome_deg_2(test3)
+c = Polynome_deg_2(test1)
 c.processing_calcul()
-
 print (c)
 
+print ("\n--------\n\n")
+
+d = Polynome_deg_2(test2)
+d.processing_calcul()
+print (d)
+
+print ("\n--------\n\n")
+
+e = Polynome_deg_2(test3)
+e.processing_calcul()
+print (e)
+
+print ("\n--------\n\n")
+
+f = Polynome_deg_2(test4)
+f.processing_calcul()
+print (f)
+
+print ("\n--------\n\n")
+
+r = Polynome_deg_2(test_invalid_polynome)
+r.processing_calcul()
+print (r)
+
+print ("\n--------\n\n")
+
+r = Polynome_deg_2(test_invalid_polynome2)
+r.processing_calcul()
+print (r)
+
+print ("\n-------\n\n")
+
+p = Polynome_deg_2(test_polynome_1)
+p.processing_calcul()
+print (p)
+
+print ("--------\n\n")
+
+p = Polynome_deg_2(test_polynome_1_indetermine)
+p.processing_calcul()
+print (p)
+
+print ("--------\n\n")
+
+p = Polynome_deg_2(test_polynome_1_impossible)
+p.processing_calcul()
+print (p)
 #print (c)
 #print (c.discr)
 #print (c.x)
