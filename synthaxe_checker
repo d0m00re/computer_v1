@@ -1,0 +1,6 @@
+test3 =                       "5 * X^0 + 4 * X^1 + 9.3 * X^2 = 1 * X^0 + 18.6 * X^2"
+
+	pattern1:
+		[[number]_[*]_[X^][number]]]
+	pattern2:
+		[[number]]

@@ -30,29 +30,32 @@
 # si d < 0 : pas de solution possible:
 
 import math
-
-class Calculator:
-	def calc_discr(self, a, b, c):
-		return (b * b - 4 * a * c)
-
-	def calc_x1(self, delta, a, b, c):
-		return (-b + math.sqrt(delta)) / (2 * a)
-
-	def calc_x2(self, delta, a, b, c):
-		return (-b - math.sqrt(delta)) / (2 * a)
-
-	def calc_x(self, a, b):
-		return (-b / (2 * a))
-
-	def calcul_polynome1(self, a, b):
-		return (-a / b);
+import re
+import sys
 
 # a : x2
 # b : x
 # c : 1 
 
+class Calculator:
+        def calc_discr(self, a, b, c):
+                return (b * b - 4 * a * c)
+
+        def calc_x1(self, delta, a, b, c):
+                return (-b + math.sqrt(delta)) / (2 * a)
+
+        def calc_x2(self, delta, a, b, c):
+                return (-b - math.sqrt(delta)) / (2 * a)
+
+        def calc_x(self, a, b):
+                return (-b / (2 * a))
+
+        def calcul_polynome1(self, a, b):
+                return (-a / b);
+
 class Polynome_deg_2:
 	def __init__(self, data):
+		self.error = 0
         	self.discr = 0.0
         	self.x = 0.0
         	self.x1 = 0.0
@@ -127,13 +130,21 @@ class Polynome_deg_2:
 				else:
 					print ("Equation impossible")
 			else:
-				Calculator().calcul_polynome1(self.main_member[0], self.main_member[1])
+				self.x = Calculator().calcul_polynome1(self.main_member[0], self.main_member[1])
 		else:
 			print ("Equation impossible")
 
 	#http://algor.chez.com/math/eq2deg.htm
 
 	def processing_calcul(self):
+		if (synthax_character_checker(self.init_data, " -+*=123456789.X^") == 0):
+			print ("error synthax : " + self.init_data)
+			self.error = 1
+			return
+		if (synthax_string_check(self.init_data) == 1):
+			print ("error synthaxx : " + self.init_data)
+			self.error = 2
+			return
 		self.parsing()
 		self.found_polynomial_degree()
 		self.calcul_polynome_gen()
@@ -151,7 +162,6 @@ class Polynome_deg_2:
 				else:
 					string += (" - ")
 			c += 1
-
 		string += (' = 0')
 		return (string)
 
@@ -166,6 +176,8 @@ class Polynome_deg_2:
 				data += ("No solution : discr --> " + str(self.discr))
 		elif (self.polynomial_degree > 2):
 				data += "The polynomial degree is stricly greater than 2, I can't solve."			
+		elif (self.polynomial_degree == 1):
+				data += str(self.x)
 		return (data)
 
 	def __str__(self):
@@ -207,6 +219,42 @@ class Test_framework:
 		for i in self.l:
 			self.test_function(i)
 
+
+#check all caratcer in string if same sep
+def synthax_character_checker(data, sep):
+	print ("check data : " + data)
+	for i in data:
+		print ("check : " + str(i))
+		if i not in sep:
+			print ("Ret zero error bitches")
+			return (0)
+	return (1)
+
+def synthax_string_check(data):
+	if (data.count('=') != 1):
+		return (1)
+	return (0)
+
+def process_str(data):
+	print('')
+	c = Polynome_deg_2(data)
+	c.processing_calcul()
+	if (c.error == 0):
+		print (c)
+
+def main_process():
+	size = len(sys.argv)
+	c = 1
+	if (size == 1):
+		data = raw_input("Data: ")
+		process_str(data)
+		return
+	while (c < size):
+		process_str(sys.argv[c])
+		c += 1
+
+main_process()
+
 test1 =                       "5 * X^0 + 4 * X^1 + 9.3 * X^2 = 1 * X^0"
 test2 =                       "5 * X^0 + 4 * X^1 - 9.3 * X^2 = 1 * X^0"
 test3 =                       "5 * X^0 + 4 * X^1 + 9.3 * X^2 = 1 * X^0 + 18.6 * X^2"
@@ -221,10 +269,10 @@ test_puiss_0_without_power_notation = "5 + 5 * X^1 + 2 * X^2 = 0"
 test_0 = "0 = 0"
 test_empty_str = ""
 
-test = Test_framework()
-test.append(test1)
-test.append(test2)
-test.test()
+#test = Test_framework()
+#test.append(test1)
+#test.append(test2)
+#test.test()
 
 '''
 c = Polynome_deg_2(test1)
