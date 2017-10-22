@@ -1,22 +1,3 @@
-# $>./computor "5 * X^0 + 4 * X^1 - 9.3 * X^2 = 1 * X^0"
-# Reduced form: 4 * X^0 + 4 * X^1 - 9.3 * X^2 = 0
-# Polynomial degree: 2
-# Discriminant is strictly positive, the two solutions are:
-# 0.905239
-# -0.475131
-# $>./computor "5 * X^0 + 4 * X^1 = 4 * X^0"
-# Reduced form: 1 * X^0 + 4 * X^1 = 0
-# Polynomial degree: 1
-# The solution is:
-# -0.25
-# ./computor "8 * X^0 - 6 * X^1 + 0 * X^2 - 5.6 * X^3 = 3 * X^0"
-# Reduced form: 5 * X^0 - 6 * X^1 + 0 * X^2 - 5.6 * X^3 = 0
-# Polynomial degree: 3
-# The polynomial degree is stricly greater than 2, I can't solve.
-
-# Polynome deg2:
-# ax^2 + bx + c = 0
-
 # SOLVER
 # 1) calcul delta:
 #	delta = b * b - 4 * a * c
@@ -57,11 +38,8 @@ class Polynome_deg_2:
 	def __init__(self, data):
 		self.error = 0
         	self.discr = 0.0
-        	self.x = 0.0
-        	self.x1 = 0.0
-        	self.x2 = 0.0
-        	self.right_member = {}
-        	self.left_member = {}
+        	self.x, self.x1, self.x2 = 0.0, 0.0, 0.0
+        	self.right_member, self.left_member = {}, {}
         	self.main_member = {}
 		self.init_data = data
 		self.polynomial_degree = 0
@@ -76,8 +54,7 @@ class Polynome_deg_2:
 			data = data[1]
 			type_power = (data.split('^'))
 			return (int(type_power[1]))
-		else:
-			return (0)
+		return (0)
 
 	def parsing_member(self, data):
 		member = {}
@@ -88,9 +65,6 @@ class Polynome_deg_2:
 			member[self.found_type_power(tmp2)] = float(tt)
 		return (member)
 
-	# reduced form
-	# 5 * X^0 + 4 * X^1 + 9.3 * X^2 = 1 * X^0 + 10 * X^5 -->
-	# 4.0 * X^0 + 4.0 * X^1 + 9.3 * X^2 - 10.0 * X^5 = 0
 	def add_two_member(self):
 		for _ in self.right_member:
 			self.main_member[_] = self.right_member[_]	
@@ -103,8 +77,7 @@ class Polynome_deg_2:
 	def parsing(self):
 		all_member = self.init_data.split('=')
 		if len(all_member) < 2:
-			print ("error")
-			return ("bibitch")
+			return ()
 		self.right_member = self.parsing_member(all_member[0])
 		self.left_member = self.parsing_member(all_member[1])
 		self.add_two_member()
@@ -116,7 +89,6 @@ class Polynome_deg_2:
 		if (self.discr > 0):
 			self.x1 = Calculator().calc_x1(self.discr, self.main_member[2], self.main_member[1], self.main_member[0])
 			self.x2 = Calculator().calc_x2(self.discr, self.main_member[2], self.main_member[1], self.main_member[0])
-
 		elif (self.discr == 0):
 			self.x = calc_x(self, a, b)
 
@@ -124,30 +96,29 @@ class Polynome_deg_2:
 		if (self.polynomial_degree == 2):
 			self.calcul_polynome()
 		elif (self.polynomial_degree == 1):
+			print (self.main_member)
 			if (self.main_member[1] == 0.0):
 				if (self.main_member[0] == 0.0):
 					print ("Equation indeterminee")
 				else:
-					print ("Equation impossible")
+					print ("Equation ympossible")
 			else:
 				self.x = Calculator().calcul_polynome1(self.main_member[0], self.main_member[1])
 		else:
-			print ("Equation impossible")
-
-	#http://algor.chez.com/math/eq2deg.htm
+			print (self.main_member.items()[0])
+			if (len(self.main_member.items())== 1 and self.main_member.items()[0] == (0, 0.0)):
+				print ("Equation indetermine.")
+			else:
+				print ("Equation impossible")
 
 	def processing_calcul(self):
-		if (synthax_character_checker(self.init_data, " -+*=123456789.X^") == 0):
-			print ("error synthax : " + self.init_data)
+		if (main_synthax_checker(self.init_data)):
+			self.parsing()
+			self.found_polynomial_degree()
+			self.calcul_polynome_gen()
+		else:
+			print ("Synthax error: " + self.init_data)
 			self.error = 1
-			return
-		if (synthax_string_check(self.init_data) == 1):
-			print ("error synthaxx : " + self.init_data)
-			self.error = 2
-			return
-		self.parsing()
-		self.found_polynomial_degree()
-		self.calcul_polynome_gen()
 
 	def display_member(self, data):
 		string = ''
@@ -157,10 +128,7 @@ class Polynome_deg_2:
 		for key, value in data.items():
 			string += str(abs(value)) + " * X^" + str(key)
 			if (c < len(data) - 1):
-				if (data.items()[c + 1][1] >= 0.0):
-					string += (" + ")
-				else:
-					string += (" - ")
+				string += {True: " + ", False: " - "}[data.items()[c + 1][1] >= 0.0]
 			c += 1
 		string += (' = 0')
 		return (string)
@@ -247,11 +215,86 @@ def main_process():
 	c = 1
 	if (size == 1):
 		data = raw_input("Data: ")
-		process_str(data)
+		if (main_synthax_checker(data)):
+			process_str(data)
+		else:
+			print ("FUCKING ERROR.\n")
 		return
 	while (c < size):
 		process_str(sys.argv[c])
 		c += 1
+
+#######
+## synthax checker
+#######
+def synthax_character_checker(data, sep):
+        for i in data:
+                if i not in sep:
+                        return (0)
+        return (1)
+
+# check good power or not
+def check_power(data):
+        ret = data.find('X^', 0, 2)
+        if (ret == 0):
+                data = data[2:]
+                for _ in data:
+                        if ((_ < '0' or _ > '9')):
+                                return (0)
+        return (1)
+
+# check good number or not
+def check_number(data):
+        c = 0
+
+        if (data[0] == '-' or data[0] == '+'):
+                c += 1
+        while c < len(data):
+                if ((data[c] < '0' or data[c] > '9') and (data[c] != '.')):
+                        return (0)
+                c += 1
+        return (1)
+
+# trouver le type de donnee
+def check_good_synthax_or_not(data):
+        my = data.split(' ')
+        number, power, add_sub, error = 0, 0, 0, 0
+        for i in my:
+                if (len(i) == 0 or (len(i) == 1 and (i[0] == '+' or i[0] == ' ' or i[0] == '-'))):
+                        if (len(i) == 0):
+                                add_sub = 0
+                        elif (i[0] == '+' or i[0] == '-'):
+                                add_sub += 1
+                elif (synthax_character_checker(i, " +-.0123456789")):
+                        if (check_number(i)):
+                                number += 1
+                        else:
+                                error += 1
+                elif (synthax_character_checker(i, "X^0123456789")):
+                        if (check_power(i)):
+                                power += 1
+                        else:
+                                error += 1
+                elif ('*' != i[0] or len(i) > 1):
+                        error += 1
+        if (error == 0 and power == 1 and number == 1):
+                return (1)
+        return (0)
+
+def main_synthax_checker(dat):
+        data = dat.split('=')
+        if (len(data) != 2):
+                return (0)
+        m1, m2 = extend_split_preserve_sep(data[0], '-+'), extend_split_preserve_sep(data[1], '-+')
+        for i in m1:
+                ret = check_good_synthax_or_not(i)
+                if (ret == 0):
+                        return (0)
+        for i in m2:
+                ret = check_good_synthax_or_not(i)
+                if (ret == 0):
+                        return (0)
+        return (1)
 
 main_process()
 

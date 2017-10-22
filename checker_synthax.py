@@ -41,41 +41,30 @@ def check_number(data):
 	return (1)
 
 # trouver le type de donnee
-def found_type_member(data):
+def check_good_synthax_or_not(data):
 	my = data.split(' ')
-	number = 0
-	power = 0
-	add_sub = 0
-	error = 0
+	number, power, add_sub, error = 0, 0, 0, 0
 	for i in my:
 		if (len(i) == 0 or (len(i) == 1 and (i[0] == '+' or i[0] == ' ' or i[0] == '-'))):
 			if (len(i) == 0):
-				add_sub == 0
+				add_sub = 0
 			elif (i[0] == '+' or i[0] == '-'):
 				add_sub += 1		
         	elif (synthax_character_checker(i, " +-.0123456789")):
 			if (check_number(i)):
 				number += 1
 			else:
-				print ("ERROR NUMBER ...\n")
 				error += 1
         	elif (synthax_character_checker(i, "X^0123456789")):
 			if (check_power(i)):
 				power += 1
 			else:
-				print ("ERROR POWER ...\n")
 				error += 1
 		elif ('*' != i[0] or len(i) > 1):
 			error += 1
 	if (error == 0 and power == 1 and number == 1):
 		return (1)
-	print ("error : " + str(error))
-	print ("power : " + str(power))
-	print ("number : " + str(number))
         return (0)
-
-#m1 = extend_split_preserve_sep(data[0], '-+')
-#m2 = extend_split_preserve_sep(data[1], '-+')
 
 def main_synthax_checker(dat):
 	data = dat.split('=')
@@ -83,11 +72,11 @@ def main_synthax_checker(dat):
 		return (0)
 	m1, m2 = extend_split_preserve_sep(data[0], '-+'), extend_split_preserve_sep(data[1], '-+')
 	for i in m1:
-		ret = found_type_member(i)
+		ret = check_good_synthax_or_not(i)
 		if (ret == 0):
 			return (0)
 	for i in m2:
-		ret = found_type_member(i)
+		ret = check_good_synthax_or_not(i)
 		if (ret == 0):
 			return (0)
 	return (1)
