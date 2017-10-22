@@ -43,7 +43,7 @@ class Polynome_deg_2:
 	def __init__(self, data):
 		self.error = 0
         	self.discr = 0.0
-        	self.x, self.x1, self.x2 = 0.0, 0.0, 0.0
+        	self.x1, self.x2 = 0.0, 0.0
         	self.right_member, self.left_member, self.main_member = {}, {}, {}
 		self.init_data = data
 		self.polynomial_degree = 0
@@ -92,7 +92,7 @@ class Polynome_deg_2:
 			self.x1 = Calculator().calc_x1(self.discr, self.main_member[2], self.main_member[1], self.main_member[0])
 			self.x2 = Calculator().calc_x2(self.discr, self.main_member[2], self.main_member[1], self.main_member[0])
 		elif (self.discr == 0):
-			self.x = calc_x(self, a, b)
+			self.x1 = calc_x(self, a, b)
 
 	def calcul_polynome_gen(self):
 		if (self.polynomial_degree == 2):
@@ -105,7 +105,7 @@ class Polynome_deg_2:
 				else:
 					print ("Equation ympossible")
 			else:
-				self.x = Calculator().calcul_polynome1(self.main_member[0], self.main_member[1])
+				self.x1 = Calculator().calcul_polynome1(self.main_member[0], self.main_member[1])
 		else:
 			print (self.main_member.items()[0])
 			if (len(self.main_member.items())== 1 and self.main_member.items()[0] == (0, 0.0)):
@@ -141,13 +141,13 @@ class Polynome_deg_2:
 			if (self.discr > 0):
 				data += str(self.x1) + '\n' + str(self.x2)
 			elif(self.discr == 0):
-				data += str(self.x)
+				data += str(self.x1)
 			else:
 				data += ("No solution : discriminant < 0.")
 		elif (self.polynomial_degree > 2):
 				data += "The polynomial degree is stricly greater than 2, I can't solve."			
 		elif (self.polynomial_degree == 1):
-				data += str(self.x)
+				data += str(self.x1)
 		return (data)
 
 	def __str__(self):
