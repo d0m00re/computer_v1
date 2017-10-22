@@ -10,8 +10,6 @@
 #
 # si d < 0 : pas de solution possible:
 
-import math
-import re
 import sys
 
 # a : x2
@@ -23,10 +21,10 @@ class Calculator:
                 return (b * b - 4 * a * c)
 
         def calc_x1(self, delta, a, b, c):
-                return (-b + math.sqrt(delta)) / (2 * a)
+                return (-b + self.sqrt(delta)) / (2 * a)
 
         def calc_x2(self, delta, a, b, c):
-                return (-b - math.sqrt(delta)) / (2 * a)
+                return (-b - self.sqrt(delta)) / (2 * a)
 
         def calc_x(self, a, b):
                 return (-b / (2 * a))
@@ -34,13 +32,19 @@ class Calculator:
         def calcul_polynome1(self, a, b):
                 return (-a / b);
 
+	def sqrt(self, nb):
+		nb = float(nb)
+		x, y = 1, nb
+		while (abs(y - x) > 0.00000000001):
+			x, y = (x + y) / 2, nb / x
+		return (x)
+
 class Polynome_deg_2:
 	def __init__(self, data):
 		self.error = 0
         	self.discr = 0.0
         	self.x, self.x1, self.x2 = 0.0, 0.0, 0.0
-        	self.right_member, self.left_member = {}, {}
-        	self.main_member = {}
+        	self.right_member, self.left_member, self.main_member = {}, {}, {}
 		self.init_data = data
 		self.polynomial_degree = 0
 
@@ -62,7 +66,7 @@ class Polynome_deg_2:
 		for i in data:
 			tmp2 = i.split('*')
 			tt = float(tmp2[0].replace(' ', '').replace('+',''))
-			member[self.found_type_power(tmp2)] = float(tt)
+			member[self.found_type_power(tmp2)] = tt
 		return (member)
 
 	def add_two_member(self):
@@ -76,8 +80,6 @@ class Polynome_deg_2:
 
 	def parsing(self):
 		all_member = self.init_data.split('=')
-		if len(all_member) < 2:
-			return ()
 		self.right_member = self.parsing_member(all_member[0])
 		self.left_member = self.parsing_member(all_member[1])
 		self.add_two_member()
@@ -141,7 +143,7 @@ class Polynome_deg_2:
 			elif(self.discr == 0):
 				data += str(self.x)
 			else:
-				data += ("No solution : discr --> " + str(self.discr))
+				data += ("No solution : discriminant < 0.")
 		elif (self.polynomial_degree > 2):
 				data += "The polynomial degree is stricly greater than 2, I can't solve."			
 		elif (self.polynomial_degree == 1):
@@ -204,7 +206,6 @@ def synthax_string_check(data):
 	return (0)
 
 def process_str(data):
-	print('')
 	c = Polynome_deg_2(data)
 	c.processing_calcul()
 	if (c.error == 0):
